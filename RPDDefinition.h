@@ -16,7 +16,7 @@ class RPDDefinition
 public:
 
 	RPDDefinition(TTree& tree);
-	~RPDDefinition() { }
+	~RPDDefinition();
 
 	void fill(const PaEvent& event, const PaVertex& vertex);
 

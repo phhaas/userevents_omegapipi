@@ -31,7 +31,7 @@ RPDDefinition::RPDDefinition(TTree& tree)
 	  _energyLossRingB     (0)
 {
 	_phast.h_file->cd();
-
+	
 	tree.Branch("RPD_numberTracks",        &_numberTracks,        "numberTracks/I");
 	tree.Branch("RPD_hasTracks",           &_hasTracks,           "hasTracks/I");
 	tree.Branch("RPD_indexBestProton",     &_indexBestProton,     "indexBestProton/I");
@@ -52,6 +52,11 @@ RPDDefinition::RPDDefinition(TTree& tree)
 	tree.Branch("RPD_zHitPositionRingB",   &_zHitPositionRingB,   "zHitPositionRingB/D");
 	tree.Branch("RPD_energyLossRingA",     &_energyLossRingA,     "energyLossRingA/D");
 	tree.Branch("RPD_energyLossRingB",     &_energyLossRingB,     "energyLossRingB/D");
+}
+
+RPDDefinition::~RPDDefinition()
+{
+  delete _momentumVector;
 }
 
 
