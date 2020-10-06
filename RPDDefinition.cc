@@ -5,6 +5,9 @@
 // Make this non-static file name
 const TString PROTON_RANGES_FILE = "protonRanges.root";
 static TLorentzVector* proton = new TLorentzVector(-10, -10, -10, -1);
+enum method {noCorrection, oldCorrection, newCorrection};
+enum targetType {hydrogenTarget, diskTarget};
+enum material {hydrogen, aluminium, mylar, scintillator, lead, tungsten};
 
 RPDDefinition::RPDDefinition(TTree& tree)
 	: _phast(Phast::Ref()),
@@ -154,11 +157,11 @@ RPDDefinition::getEnergy(const int useMethod) const
 {
 	//TODO use enum for useMethod
 	switch (useMethod) {
-		case 0: // No correction
+		case noCorrection: // No correction
 			return _energyNoCorrection;
-		case 1:  // Old correction
+		case oldCorrection:  // Old correction
 			return _energyOldCorrection;
-		case 2:  // New correction
+		case newCorrection:  // New correction
 			return _energyNewCorrection;
 		default:
 			std::cerr << "Undefined energy type in function:" << __PRETTY_FUNCTION__ << std::endl;
@@ -195,10 +198,10 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 	};  // [cm]
 	//TODO make enum for target material
 	const int targetMaterial[16] = {
-		5, 5, 5, 5,
-		5, 5, 5, 5,
-		5, 5, 6, 6,
-		5, 5, 6, 6
+		tungsten, tungsten, tungsten, tungsten,
+		tungsten, tungsten, tungsten, tungsten,
+		tungsten, tungsten, 6, 6,
+		tungsten, tungsten, 6, 6
 	};
 
 	// get uncorrected momentum
@@ -215,10 +218,10 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 	}
 	switch (useMethod) {
 		// No correction
-		case 0:
+		case noCorrection:
 			break;
 		// Old correction
-		case 1:
+		case oldCorrection:
 			if (pRPD >= 0.596) {
 				break;
 			}
@@ -226,7 +229,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 			pRPD = getInterpolatedEnergy(pRPD, 3, rpdRingAThickness      / TMath::Sin(theta));
 			pRPD = getInterpolatedEnergy(pRPD, 2, rpdChaussetteThickness / TMath::Sin(theta));
 			switch (useDiskTarget) {
-				case 0: {  // Hydrogen target
+				case hydrogenTarget: {  // Hydrogen target
 					pRPD = getInterpolatedEnergy(pRPD, 1, targetAluminumThickness / TMath::Sin(theta));
 					pRPD = getInterpolatedEnergy(pRPD, 2, targetCellThickness     / TMath::Sin(theta));
 					double traversedHydrogen = TMath::Sqrt(pow(targetCellRadius * TMath::Cos(phi) - vertex.X(), 2) + pow(targetCellRadius * TMath::Sin(phi) - vertex.Y(), 2));
@@ -234,7 +237,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 					pRPD = getInterpolatedEnergy(pRPD, 0, traversedHydrogen);
 					break;
 				}
-				case 1:  // Disk target
+				case diskTarget:  // Disk target
 					for (size_t i = 1; i < 17; ++i) {
 						if (    (targetDiskCenterZPos[i - 1] + targetDiskCenterZPos[i]    ) / 2. < (vertex.Z() + 66.7)
 						    and (targetDiskCenterZPos[i]     + targetDiskCenterZPos[i + 1]) / 2. > (vertex.Z() + 66.7)) {
@@ -250,12 +253,12 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 			}
 			break;
 		// New correction
-		case 2:
+		case newCorrection:
 			// RPD
 			pRPD = getCorrectedEnergyNew(pRPD, 3, rpdRingAThickness      / TMath::Sin(theta));
 			pRPD = getCorrectedEnergyNew(pRPD, 2, rpdChaussetteThickness / TMath::Sin(theta));
 			switch (useDiskTarget) {
-				case 0: {  // Hydrogen target
+				case hydrogenTarget: {  // Hydrogen target
 					pRPD = getCorrectedEnergyNew(pRPD, 1, targetAluminumThickness / TMath::Sin(theta));
 					pRPD = getCorrectedEnergyNew(pRPD, 2, targetCellThickness     / TMath::Sin(theta));
 					double traversedHydrogen = TMath::Sqrt(pow(targetCellRadius * TMath::Cos(phi) - vertex.X(), 2) + pow(targetCellRadius * TMath::Sin(phi) - vertex.Y(), 2));
@@ -263,7 +266,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 					pRPD = getCorrectedEnergyNew(pRPD, 0, traversedHydrogen);
 					break;
 				}
-				case 1:  // Disk target
+				case diskTarget:  // Disk target
 					for (size_t i = 1; i < 17; ++i) {
 						if (    (targetDiskCenterZPos[i - 1] + targetDiskCenterZPos[i]    ) / 2. < (vertex.Z() + 66.7)
 						    and (targetDiskCenterZPos[i]     + targetDiskCenterZPos[i + 1]) / 2. > (vertex.Z() + 66.7)) {
@@ -321,27 +324,27 @@ RPDDefinition::getCorrectedEnergyNew(const double pRPD,                      // 
 	static TSpline3* energyFunctionTungsten     = (TSpline3*) protonRanges->Get("TUNGSTEN/splineRtoE");
 
 	switch (materialType) {
-		case 0: // Hydogen
+		case hydrogen: // Hydogen
 			rangeFunction  = rangeFunctionHydrogen;
 			energyFunction = energyFunctionHydrogen;
 			break;
-		case 1: // Aluminium
+		case aluminium: // Aluminium
 			rangeFunction  = rangeFunctionAluminium;
 			energyFunction = energyFunctionAluminium;
 			break;
-		case 2: // Mylar
+		case mylar: // Mylar
 			rangeFunction  = rangeFunctionMylar;
 			energyFunction = energyFunctionMylar;
 			break;
-		case 3: // Scintillator
+		case scintillator: // Scintillator
 			rangeFunction  = rangeFunctionScintillator;
 			energyFunction = energyFunctionScintillator;
 			break;
-		case 4: // Lead
+		case lead: // Lead
 			rangeFunction  = rangeFunctionLead;
 			energyFunction = energyFunctionLead;
 			break;
-		case 5: // Tungsten
+		case tungsten: // Tungsten
 			rangeFunction  = rangeFunctionTungsten;
 			energyFunction = energyFunctionTungsten;
 			break;
@@ -584,32 +587,32 @@ RPDDefinition::getInterpolatedEnergy(const double pRPD,
 
 	double a, b, c;
 	switch (materialType) {
-		case 0:
+		case hydrogen:
 			a = range_H2[i - 1];
 			b = range_H2[i];
 			c = range_H2[i + 1];
 			break;
-		case 1:
+		case aluminium:
 			a = range_Aluminium[i - 1];
 			b = range_Aluminium[i];
 			c = range_Aluminium[i + 1];
 			break;
-		case 2:
+		case mylar:
 			a = range_Mylar[i - 1];
 			b = range_Mylar[i];
 			c = range_Mylar[i + 1];
 			break;
-		case 3:
+		case scintillator:
 			a = range_Scintillator[i - 1];
 			b = range_Scintillator[i];
 			c = range_Scintillator[i + 1];
 			break;
-		case 4:
+		case lead:
 			a = range_Lead[i - 1];
 			b = range_Lead[i];
 			c = range_Lead[i + 1];
 			break;
-		case 5:
+		case tungsten:
 			a = range_Tungsten[i - 1];
 			b = range_Tungsten[i];
 			c = range_Tungsten[i + 1];
