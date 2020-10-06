@@ -4,7 +4,7 @@
 
 // Make this non-static file name
 const TString PROTON_RANGES_FILE = "protonRanges.root";
-
+static TLorentzVector* proton = new TLorentzVector(-10, -10, -10, -1);
 
 RPDDefinition::RPDDefinition(TTree& tree)
 	: _phast(Phast::Ref()),
@@ -118,7 +118,6 @@ RPDDefinition::getBestProton() const
 	if (_indexBestProton < 0 or _indexBestProton > (int)_protons.size()) {
 		//TODO this is a potential memory leak
 		//     at least making "proton" static and reuse object once it is created
-		TLorentzVector* proton = new TLorentzVector(-10, -10, -10, -1);
 		return* proton;
 	}
 	return _protons[_indexBestProton];
