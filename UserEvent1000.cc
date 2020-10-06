@@ -108,67 +108,59 @@ UserEvent1000(PaEvent& event)
 	selectionHelper->fillStatistics("ECAL Cluster");
 
 	// Loop over vertices
-	//TODO require exactly 1 primary vertex using iBestPrimaryVertex
-	//     do not loop over vertices
-	//     make sure variables in vertexDefinition use iBestPrimaryVertex
+	// fixed multiple vertices
 	bool accepted = false;
-	for (int iVertex  = 0; iVertex < event.NVertex(); ++iVertex) {
-		const PaVertex& vertex = event.vVertex(iVertex);
-
-		// Check if primary vertex
-		if (not vertex.IsPrimary()) {
-			continue;
-		}
-
-		// Vertex cut around target
-		if (not (C_TARGET_UP <= vertex.Z() and vertex.Z() <= C_TARGET_DOWN)) {
-			continue;
-		}
-		selectionHelper->fillStatistics("Target");
-
-
-		// Number of outgoing particles in primary vertex
-		if (vertex.NOutParticles() != C_NUMBER_PARTICLES_CHARGED) {
-			continue;
-		}
-		selectionHelper->fillStatistics("Outgoing");
-
-		// Tracks in RPD
-		if (not rpdDefinition->cutHasTracks(event, vertex)) {
-			continue;
-		}
-		selectionHelper->fillStatistics("RPD tracks");
-
-		// Best proton in RPD
-		if (not rpdDefinition->cutHasBestProton(event, vertex)) {
-			continue;
-		}
-		selectionHelper->fillStatistics("RPD proton");
-
-		const PaParticle& beamParticle = beamDefinition->getBeamParticle(event, vertex);
-
-		// Scattered particle
-		const vector<PaParticle>& scatteredParticles = scatteredDefinition->getScatteredParticles(event, vertex);
-
-		// Check charge conservation
-		if (not selectionHelper->isCorrectCharge(beamParticle, scatteredParticles)) {
-			continue;
-		}
-		selectionHelper->fillStatistics("Charge");
-
-
-		// --- FILL ACCEPTED EVENTS ---
-
-		// Accepted
-		accepted = true;
-
-		selectionHelper->fill    (event);
-		vertexDefinition->fill   (event, vertex);
-		ecalDefinition->fill     (event);
-		rpdDefinition->fill      (event, vertex);
-		scatteredDefinition->fill(event       , scatteredParticles, vertex);
-		beamDefinition->fill     (beamParticle, event             , vertex);
+	const PaVertex& vertex = event.vVertex(event.iBestPrimaryVertex());
+	
+	// Vertex cut around target
+	if (not (C_TARGET_UP <= vertex.Z() and vertex.Z() <= C_TARGET_DOWN)) {
+		return;
 	}
+	selectionHelper->fillStatistics("Target");
+
+
+	// Number of outgoing particles in primary vertex
+	if (vertex.NOutParticles() != C_NUMBER_PARTICLES_CHARGED) {
+		return;
+	}
+	selectionHelper->fillStatistics("Outgoing");
+
+	// Tracks in RPD
+	if (not rpdDefinition->cutHasTracks(event, vertex)) {
+		return;
+	}
+	selectionHelper->fillStatistics("RPD tracks");
+
+	// Best proton in RPD
+	if (not rpdDefinition->cutHasBestProton(event, vertex)) {
+		return;
+	}
+	selectionHelper->fillStatistics("RPD proton");
+
+	const PaParticle& beamParticle = beamDefinition->getBeamParticle(event, vertex);
+
+	// Scattered particle
+	const vector<PaParticle>& scatteredParticles = scatteredDefinition->getScatteredParticles(event, vertex);
+
+	// Check charge conservation
+	if (not selectionHelper->isCorrectCharge(beamParticle, scatteredParticles)) {
+		return;
+	}
+	selectionHelper->fillStatistics("Charge");
+
+
+	// --- FILL ACCEPTED EVENTS ---
+
+	// Accepted
+	accepted = true;
+
+	selectionHelper->fill    (event);
+	vertexDefinition->fill   (event, vertex);
+	ecalDefinition->fill     (event);
+	rpdDefinition->fill      (event, vertex);
+	scatteredDefinition->fill(event       , scatteredParticles, vertex);
+	beamDefinition->fill     (beamParticle, event             , vertex);
+	
 
 	// Always fill tree if MC - use isAcceptedMC branch to distinguish
 	if (event.IsMC()) {
