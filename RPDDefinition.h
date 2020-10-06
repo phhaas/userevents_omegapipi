@@ -88,7 +88,6 @@ private:
 	double _zHitPositionRingB;
 	double _energyLossRingA;
 	double _energyLossRingB;
-	bool   _isDT0;
 
 };
 

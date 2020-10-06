@@ -28,8 +28,7 @@ RPDDefinition::RPDDefinition(TTree& tree)
 	  _zHitPositionRingA   (0),
 	  _zHitPositionRingB   (0),
 	  _energyLossRingA     (0),
-	  _energyLossRingB     (0),
-	  _isDT0               (false)
+	  _energyLossRingB     (0)
 {
 	_phast.h_file->cd();
 
@@ -53,7 +52,6 @@ RPDDefinition::RPDDefinition(TTree& tree)
 	tree.Branch("RPD_zHitPositionRingB",   &_zHitPositionRingB,   "zHitPositionRingB/D");
 	tree.Branch("RPD_energyLossRingA",     &_energyLossRingA,     "energyLossRingA/D");
 	tree.Branch("RPD_energyLossRingB",     &_energyLossRingB,     "energyLossRingB/D");
-	tree.Branch("RPD_isDT0",               &_isDT0,               "DT0/B");
 }
 
 
@@ -93,7 +91,6 @@ RPDDefinition::fill(const PaEvent&  event,
 	_zHitPositionRingB = _rpd.ZB()[_indexBestProton];
 	_energyLossRingA   = _rpd.dE_A()[_indexBestProton];
 	_energyLossRingB   = _rpd.dE_B()[_indexBestProton];
-	_isDT0             = _rpd.IsDT0();  //TODO this redundant to SelectionHelper::isDT0()
 }
 
 

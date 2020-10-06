@@ -37,8 +37,9 @@ SelectionHelper::fill(const PaEvent& event)
 	_runNumber     = event.RunNum();
 	_spillNumber   = event.SpillNum();
 	_eventInSpill  = event.EvInSpill();
+	_DT0 = isDT0();
 	if (event.IsMC()) {
-		if (isDT0()) {
+		if (_DT0) {
 			_triggerMask   = 1;
 			_masterTrigger = 1;
 		} else {
@@ -49,7 +50,6 @@ SelectionHelper::fill(const PaEvent& event)
 		_triggerMask = (event.TrigMask() & 0xfff);
 	}
 	_masterTrigger = event.MasterTriggerMask();
-	//TODO _DT0 is never set
 	_tcsPhase    = event.TCSphase();
 	_timeInSpill = event.TimeInSpill();
 }
