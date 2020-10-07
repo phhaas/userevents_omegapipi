@@ -127,13 +127,13 @@ UserEvent1000(PaEvent& event)
 
 	// Tracks in RPD
 	rpdDefinition->initRPD(event);
-	if (not rpdDefinition->cutHasTracks(event, vertex)) {
+	if (not rpdDefinition->cutHasTracks()) {
 		return;
 	}
 	selectionHelper->fillStatistics("RPD tracks");
 
 	// Best proton in RPD
-	if (not rpdDefinition->cutHasBestProton(event, vertex)) {
+	if (not rpdDefinition->cutHasBestProton()) {
 		return;
 	}
 	selectionHelper->fillStatistics("RPD proton");

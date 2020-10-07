@@ -20,8 +20,8 @@ public:
 
 	void fill(const PaEvent& event, const PaVertex& vertex);
 
-	bool cutHasTracks    (const PaEvent& event, const PaVertex& vertex) const;
-	bool cutHasBestProton(const PaEvent& event, const PaVertex& vertex) const;
+	bool cutHasTracks    () const;
+	bool cutHasBestProton() const;
 	void initRPD(const PaEvent& event);
 
 private:

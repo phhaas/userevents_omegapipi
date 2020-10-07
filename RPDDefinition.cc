@@ -106,16 +106,14 @@ RPDDefinition::fill(const PaEvent&  event,
 
 
 bool
-RPDDefinition::cutHasTracks(const PaEvent&  event,
-                            const PaVertex& vertex) const
+RPDDefinition::cutHasTracks() const
 {
 	return _rpd.HasTracks();
 }
 
 
 bool
-RPDDefinition::cutHasBestProton(const PaEvent&  event,
-                                const PaVertex& vertex) const
+RPDDefinition::cutHasBestProton() const
 {
 	return _rpd.iBestProtonTrack() > -1;
 }
