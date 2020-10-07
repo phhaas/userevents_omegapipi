@@ -52,6 +52,7 @@ ECALDefinition::fill(const PaEvent& event)
 	_neutralClusterEnergyError.clear();
 	_neutralClusterTime.clear();
 	_neutralClusterSize.clear();
+	_neutralClusterIndexCell.clear();
 	_neutralClusterXInCell.clear();
 	_neutralClusterYInCell.clear();
 	_neutralClusterIndex.reserve      (_neutralClusterNumber);
@@ -82,8 +83,8 @@ ECALDefinition::fill(const PaEvent& event)
 			_neutralClusterIndexCell.push_back(_ECAL1.iCell(cluster.X(), cluster.Y(), cellX, cellY, 0));
 			dX = cluster.X() - cellX;
 			dY = cluster.Y() - cellY;
-			_ECAL2ClusterXInCell.push_back(dX);
-			_ECAL2ClusterYInCell.push_back(dY);
+			_neutralClusterXInCell.push_back(dX);
+			_neutralClusterYInCell.push_back(dY);
 			
 		} else if (_ECAL2.IsMyCluster(cluster)) {
 			// ECAL 2

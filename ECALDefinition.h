@@ -29,12 +29,9 @@ class ECALDefinition
 		//TODO are separate sets for ECAL 1 and ECAL 2 really needed?
 		//     wouldn't it be easier to add a vector with the ECAL indices?
 		// ECAL 1
-		unsigned long       _ECAL1ClusterNumber;
+
 		// ECAL 2
-		unsigned long       _ECAL2ClusterNumber;
-		std::vector<int>    _ECAL2IndexCell;
-		std::vector<double> _ECAL2ClusterXInCell;
-		std::vector<double> _ECAL2ClusterYInCell;
+
 		// Both ECALs
 		unsigned long       _neutralClusterNumber;
 		std::vector<int> _neutralClusterIndex;
