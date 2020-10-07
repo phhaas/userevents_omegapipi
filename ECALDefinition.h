@@ -17,12 +17,6 @@ class ECALDefinition
 
 	private:
 
-		const std::vector<double>& getECAL1clusterX() const { return _ECAL1ClusterX; };
-		const std::vector<double>& getECAL1clusterY() const { return _ECAL1ClusterY; };
-		const std::vector<double>& getECAL1clusterZ() const { return _ECAL1ClusterZ; };
-
-		unsigned long getECAL1ClusterNumber(const PaEvent& event);
-		unsigned long getECAL2ClusterNumber(const PaEvent& event);
 		const std::vector<int>& getVectorNeutrals(const PaEvent& event);
 
 		Phast& _phast;
@@ -36,33 +30,14 @@ class ECALDefinition
 		//     wouldn't it be easier to add a vector with the ECAL indices?
 		// ECAL 1
 		unsigned long       _ECAL1ClusterNumber;
-		std::vector<double> _ECAL1ClusterX;
-		std::vector<double> _ECAL1ClusterY;
-		std::vector<double> _ECAL1ClusterZ;
-		std::vector<double> _ECAL1ClusterXError;
-		std::vector<double> _ECAL1ClusterYError;
-		std::vector<double> _ECAL1ClusterZError;
-		std::vector<double> _ECAL1ClusterEnergy;
-		std::vector<double> _ECAL1ClusterEnergyError;
-		std::vector<double> _ECAL1ClusterTime;
-		std::vector<int>    _ECAL1ClusterSize;
 		// ECAL 2
 		unsigned long       _ECAL2ClusterNumber;
-		std::vector<double> _ECAL2ClusterX;
-		std::vector<double> _ECAL2ClusterY;
-		std::vector<double> _ECAL2ClusterZ;
-		std::vector<double> _ECAL2ClusterXError;
-		std::vector<double> _ECAL2ClusterYError;
-		std::vector<double> _ECAL2ClusterZError;
-		std::vector<double> _ECAL2ClusterEnergy;
-		std::vector<double> _ECAL2ClusterEnergyError;
-		std::vector<double> _ECAL2ClusterTime;
-		std::vector<int>    _ECAL2ClusterSize;
 		std::vector<int>    _ECAL2IndexCell;
 		std::vector<double> _ECAL2ClusterXInCell;
 		std::vector<double> _ECAL2ClusterYInCell;
 		// Both ECALs
 		unsigned long       _neutralClusterNumber;
+		std::vector<int> _neutralClusterIndex;
 		std::vector<double> _neutralClusterX;
 		std::vector<double> _neutralClusterY;
 		std::vector<double> _neutralClusterZ;
@@ -72,7 +47,10 @@ class ECALDefinition
 		std::vector<double> _neutralClusterEnergy;
 		std::vector<double> _neutralClusterEnergyError;
 		std::vector<double> _neutralClusterTime;
-		std::vector<double> _neutralClusterSize;
+		std::vector<int> _neutralClusterSize;
+		std::vector<int>    _neutralClusterIndexCell;
+		std::vector<double> _neutralClusterXInCell;
+		std::vector<double> _neutralClusterYInCell;
 
 };
 
