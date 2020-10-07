@@ -126,6 +126,7 @@ UserEvent1000(PaEvent& event)
 	selectionHelper->fillStatistics("Outgoing");
 
 	// Tracks in RPD
+	rpdDefinition->initRPD(event);
 	if (not rpdDefinition->cutHasTracks(event, vertex)) {
 		return;
 	}

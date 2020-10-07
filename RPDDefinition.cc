@@ -62,15 +62,17 @@ RPDDefinition::~RPDDefinition()
   delete _momentumVector;
 }
 
+void RPDDefinition::initRPD(const PaEvent& event)
+{
+	const PaVertex& vertex = event.vVertex(event.iBestPrimaryVertex());
+	_rpd.Search(event, vertex, RPD_CORRECT_MOMENTUM, RPD_CORRECT_ANGLES);
+}
 
 void
 RPDDefinition::fill(const PaEvent&  event,
                     const PaVertex& vertex)
 {
-	//TODO cut down on on number of calls to _rpd.Search()
-	//     currently it is called at least 3 times per event
-	_rpd.Search(event, vertex, RPD_CORRECT_MOMENTUM, RPD_CORRECT_ANGLES);
-
+  
 	_protons             = getProtons();
 	_numberTracks        = _rpd.nTrack();
 	_hasTracks           = _rpd.HasTracks() ? 1 : 0;
@@ -80,13 +82,14 @@ RPDDefinition::fill(const PaEvent&  event,
 	_momentumY           = _bestProton.Y();
 	_momentumZ           = _bestProton.Z();
 	//TODO this is a potential memory leak; reuse object once it is created; add to destructor
+	//fixed
 	_momentumVector      = new TVector3(_momentumX, _momentumY, _momentumY);
 	_beta                = _bestProton.Beta();
 	_phi                 = getPhi();
 	_theta               = getTheta();
 	_energyNoCorrection  = _bestProton.E();
-	_energyOldCorrection = getCorrectedEnergy(1, event, vertex);
-	_energyNewCorrection = getCorrectedEnergy(2, event, vertex);
+	_energyOldCorrection = getCorrectedEnergy(oldCorrection, event, vertex);
+	_energyNewCorrection = getCorrectedEnergy(newCorrection, event, vertex);
 	_hitTime             = _rpd.PV_T()[_indexBestProton];
 	if (_hasTracks) {
 		for (int i = 0; i < _numberTracks; ++i) {
@@ -106,7 +109,6 @@ bool
 RPDDefinition::cutHasTracks(const PaEvent&  event,
                             const PaVertex& vertex) const
 {
-	_rpd.Search(event, vertex, RPD_CORRECT_MOMENTUM, RPD_CORRECT_ANGLES);
 	return _rpd.HasTracks();
 }
 
@@ -115,7 +117,6 @@ bool
 RPDDefinition::cutHasBestProton(const PaEvent&  event,
                                 const PaVertex& vertex) const
 {
-	_rpd.Search(event, vertex, RPD_CORRECT_MOMENTUM, RPD_CORRECT_ANGLES);
 	return _rpd.iBestProtonTrack() > -1;
 }
 
@@ -126,6 +127,7 @@ RPDDefinition::getBestProton() const
 	if (_indexBestProton < 0 or _indexBestProton > (int)_protons.size()) {
 		//TODO this is a potential memory leak
 		//     at least making "proton" static and reuse object once it is created
+		//fixed
 		return* proton;
 	}
 	return _protons[_indexBestProton];
@@ -156,6 +158,7 @@ double
 RPDDefinition::getEnergy(const int useMethod) const
 {
 	//TODO use enum for useMethod
+	//fixed
 	switch (useMethod) {
 		case noCorrection: // No correction
 			return _energyNoCorrection;
@@ -197,6 +200,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 		360.0695, 400.0
 	};  // [cm]
 	//TODO make enum for target material
+	//fixed
 	const int targetMaterial[16] = {
 		tungsten, tungsten, tungsten, tungsten,
 		tungsten, tungsten, tungsten, tungsten,
@@ -212,6 +216,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 
 	const int runNumber = event.RunNum();
 	//TODO make enum for target type
+	//fixed
 	int useDiskTarget = 1;
 	if (runNumber < 80608 or runNumber > 81093) {
 		useDiskTarget = 0;
@@ -226,15 +231,15 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 				break;
 			}
 			// RPD
-			pRPD = getInterpolatedEnergy(pRPD, 3, rpdRingAThickness      / TMath::Sin(theta));
-			pRPD = getInterpolatedEnergy(pRPD, 2, rpdChaussetteThickness / TMath::Sin(theta));
+			pRPD = getInterpolatedEnergy(pRPD, scintillator, rpdRingAThickness      / TMath::Sin(theta));
+			pRPD = getInterpolatedEnergy(pRPD, mylar, rpdChaussetteThickness / TMath::Sin(theta));
 			switch (useDiskTarget) {
 				case hydrogenTarget: {  // Hydrogen target
-					pRPD = getInterpolatedEnergy(pRPD, 1, targetAluminumThickness / TMath::Sin(theta));
-					pRPD = getInterpolatedEnergy(pRPD, 2, targetCellThickness     / TMath::Sin(theta));
+					pRPD = getInterpolatedEnergy(pRPD, aluminium, targetAluminumThickness / TMath::Sin(theta));
+					pRPD = getInterpolatedEnergy(pRPD, mylar, targetCellThickness     / TMath::Sin(theta));
 					double traversedHydrogen = TMath::Sqrt(pow(targetCellRadius * TMath::Cos(phi) - vertex.X(), 2) + pow(targetCellRadius * TMath::Sin(phi) - vertex.Y(), 2));
 					traversedHydrogen        = traversedHydrogen / TMath::Sin(theta);
-					pRPD = getInterpolatedEnergy(pRPD, 0, traversedHydrogen);
+					pRPD = getInterpolatedEnergy(pRPD, hydrogen, traversedHydrogen);
 					break;
 				}
 				case diskTarget:  // Disk target
@@ -255,15 +260,15 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod,
 		// New correction
 		case newCorrection:
 			// RPD
-			pRPD = getCorrectedEnergyNew(pRPD, 3, rpdRingAThickness      / TMath::Sin(theta));
-			pRPD = getCorrectedEnergyNew(pRPD, 2, rpdChaussetteThickness / TMath::Sin(theta));
+			pRPD = getCorrectedEnergyNew(pRPD, scintillator, rpdRingAThickness      / TMath::Sin(theta));
+			pRPD = getCorrectedEnergyNew(pRPD, mylar, rpdChaussetteThickness / TMath::Sin(theta));
 			switch (useDiskTarget) {
 				case hydrogenTarget: {  // Hydrogen target
-					pRPD = getCorrectedEnergyNew(pRPD, 1, targetAluminumThickness / TMath::Sin(theta));
-					pRPD = getCorrectedEnergyNew(pRPD, 2, targetCellThickness     / TMath::Sin(theta));
+					pRPD = getCorrectedEnergyNew(pRPD, aluminium, targetAluminumThickness / TMath::Sin(theta));
+					pRPD = getCorrectedEnergyNew(pRPD, mylar, targetCellThickness     / TMath::Sin(theta));
 					double traversedHydrogen = TMath::Sqrt(pow(targetCellRadius * TMath::Cos(phi) - vertex.X(), 2) + pow(targetCellRadius * TMath::Sin(phi) - vertex.Y(), 2));
 					traversedHydrogen        = traversedHydrogen / TMath::Sin(theta);
-					pRPD = getCorrectedEnergyNew(pRPD, 0, traversedHydrogen);
+					pRPD = getCorrectedEnergyNew(pRPD, hydrogen, traversedHydrogen);
 					break;
 				}
 				case diskTarget:  // Disk target

@@ -22,9 +22,11 @@ public:
 
 	bool cutHasTracks    (const PaEvent& event, const PaVertex& vertex) const;
 	bool cutHasBestProton(const PaEvent& event, const PaVertex& vertex) const;
+	void initRPD(const PaEvent& event);
 
 private:
 
+  
 	const vector<TLorentzVector>& getProtons   () const { return _rpd.vTracks(); }
 	const TLorentzVector&         getBestProton() const;
 
@@ -88,7 +90,7 @@ private:
 	double _zHitPositionRingB;
 	double _energyLossRingA;
 	double _energyLossRingB;
-
+	
 };
 
 #endif  // RPDDEFINITIONS_H
