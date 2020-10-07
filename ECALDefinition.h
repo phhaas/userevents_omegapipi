@@ -18,6 +18,7 @@ class ECALDefinition
 	private:
 
 		const std::vector<int>& getVectorNeutrals(const PaEvent& event);
+		double getIsolation(const PaEvent& event, const PaCaloClus& cluster);
 
 		Phast& _phast;
 
@@ -48,6 +49,7 @@ class ECALDefinition
 		std::vector<int>    _neutralClusterIndexCell;
 		std::vector<double> _neutralClusterXInCell;
 		std::vector<double> _neutralClusterYInCell;
+		std::vector<double> _neutralClusterIsolation;
 
 };
 

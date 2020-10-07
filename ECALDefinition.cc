@@ -55,6 +55,7 @@ ECALDefinition::fill(const PaEvent& event)
 	_neutralClusterIndexCell.clear();
 	_neutralClusterXInCell.clear();
 	_neutralClusterYInCell.clear();
+	_neutralClusterIsolation.clear();
 	_neutralClusterIndex.reserve      (_neutralClusterNumber);
 	_neutralClusterX.reserve          (_neutralClusterNumber);
 	_neutralClusterY.reserve          (_neutralClusterNumber);
@@ -69,7 +70,8 @@ ECALDefinition::fill(const PaEvent& event)
 	_neutralClusterIndexCell.reserve  (_neutralClusterNumber);
 	_neutralClusterXInCell.reserve    (_neutralClusterNumber);
 	_neutralClusterYInCell.reserve    (_neutralClusterNumber);	
-
+	_neutralClusterIsolation.reserve    (_neutralClusterNumber);	
+	
 	for (size_t i = 0; i < _vectorNeutrals.size(); ++i) {
 		const PaParticle& particle = event.vParticle(_vectorNeutrals[i]);
 		const PaCaloClus& cluster  = event.vCaloClus(particle.iCalorim(0));
@@ -106,6 +108,8 @@ ECALDefinition::fill(const PaEvent& event)
 		_neutralClusterEnergyError.push_back(cluster.Eerr()  );
 		_neutralClusterTime.push_back       (cluster.Time()  );
 		_neutralClusterSize.push_back       (cluster.Size()  );
+		_neutralClusterIsolation.push_back  ( getIsolation(event, cluster));
+		
 	}  // loop over _vectorNeutrals
 }
 
@@ -144,4 +148,33 @@ ECALDefinition::getVectorNeutrals(const PaEvent& event)
 	}
 
 	return _vectorNeutrals;
+}
+
+double
+ECALDefinition::getIsolation(const PaEvent& event, const PaCaloClus& cluster )
+{
+	double caloZ = cluster.Z();
+	double distanceR = 9999;
+	const PaVertex& vertex = event.vVertex(event.iBestPrimaryVertex());
+	
+	for (int i = 0; i < vertex.NOutParticles(); ++i) {
+		PaParticle particle = event.vParticle(vertex.iOutParticle(i));
+		// charged particle
+		//if (particle.Q() == 0) {
+			//continue;
+		//}
+		// particle has track
+		//if (particle.iTrack() == -1) {
+		//	continue;
+		//}
+		const PaTrack& track = event.vTrack(particle.iTrack());
+		PaTPar trackPar;
+		if (track.Extrapolate(caloZ, trackPar)) 
+		{
+			double tmp = std::sqrt( (cluster.X()-trackPar.X())*(cluster.X()-trackPar.X()) + (cluster.Y()-trackPar.Y())*(cluster.Y()-trackPar.Y()));
+			if (tmp<distanceR) distanceR = tmp ;
+		}
+	}
+	
+	return distanceR;
 }
