@@ -11,7 +11,6 @@ class BeamDefinition
 		BeamDefinition(TTree& tree);
 		~BeamDefinition() { }
 
-		void fill  (const PaParticle& particle, const PaEvent& event, const PaVertex& vertex);
 		void fill  (const PaEvent&    event);
 		void fillMC(const PaMCtrack&  track);
 

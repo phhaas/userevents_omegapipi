@@ -160,7 +160,7 @@ UserEvent1000(PaEvent& event)
 	ecalDefinition->fill     (event);
 	rpdDefinition->fill      (event, vertex);
 	scatteredDefinition->fill(event       , scatteredParticles, vertex);
-	beamDefinition->fill     (beamParticle, event             , vertex);
+	beamDefinition->fill     (event);
 	
 
 	// Always fill tree if MC - use isAcceptedMC branch to distinguish

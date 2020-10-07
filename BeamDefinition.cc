@@ -35,40 +35,24 @@ BeamDefinition::BeamDefinition(TTree& tree)
 
 
 void
-BeamDefinition::fill(const PaParticle& particle,
-                     const PaEvent&    event,
-                     const PaVertex&   vertex)
+BeamDefinition::fill(const PaEvent&    event)
 {
+	const PaVertex& vertex = event.vVertex(event.iBestPrimaryVertex());
+	const PaParticle& beamParticle = getBeamParticle(event, vertex);
+	
 	const int      vertexIndex = vertex.MyIndex();
-	const PaTrack& track       = event.vTrack(particle.iTrack());
-	_gradX    = particle.ParInVtx(vertexIndex).dXdZ();
-	_gradY    = particle.ParInVtx(vertexIndex).dYdZ();
+	const PaTrack& track       = event.vTrack(beamParticle.iTrack());
+	_gradX    = beamParticle.ParInVtx(vertexIndex).dXdZ();
+	_gradY    = beamParticle.ParInVtx(vertexIndex).dYdZ();
 	_time     = track.MeanTime();
 	_firstZ   = track.ZFirst();
 	_lastZ    = track.ZLast();
 	_minimalZ = track.Zmin();
 	_maximumZ = track.Zmax();
 	_chi2     = track.Chi2tot() / track.Ndf();
-	_charge   = particle.Q();
-	_pid      = particle.PID();
+	_charge   = beamParticle.Q();
+	_pid      = beamParticle.PID();
 }
-
-
-void
-BeamDefinition::fill(const PaEvent& event)
-{
-	//TODO use iBestPrimaryVertex()
-	for (int iVertex = 0; iVertex < event.NVertex(); ++iVertex) {
-		const PaVertex& vertex = event.vVertex(iVertex);
-		// Check if primary Vertex
-		if (not vertex.IsPrimary()) {
-			continue;
-		}
-		const PaParticle& beamParticle = getBeamParticle(event, vertex);
-		fill(beamParticle, event, vertex);
-	}
-}
-
 
 void
 BeamDefinition::fillMC(const PaMCtrack& track)
