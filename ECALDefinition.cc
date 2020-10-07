@@ -29,6 +29,7 @@ ECALDefinition::ECALDefinition(TTree& tree)
 	tree.Branch("ECAL_IndexCell",                 &_neutralClusterIndexCell);
 	tree.Branch("ECAL_clusterXInCell",            &_neutralClusterXInCell);
 	tree.Branch("ECAL_clusterYInCell",            &_neutralClusterYInCell);
+	tree.Branch("ECAL_isolation",                 &_neutralClusterIsolation);
 }
 
 
@@ -154,22 +155,22 @@ double
 ECALDefinition::getIsolation(const PaEvent& event, const PaCaloClus& cluster )
 {
 	double caloZ = cluster.Z();
-	double distanceR = 9999;
+	double distanceR = 500;
 	const PaVertex& vertex = event.vVertex(event.iBestPrimaryVertex());
 	
 	for (int i = 0; i < vertex.NOutParticles(); ++i) {
 		PaParticle particle = event.vParticle(vertex.iOutParticle(i));
 		// charged particle
-		//if (particle.Q() == 0) {
-			//continue;
-		//}
+		if (particle.Q() == 0) {
+			continue;
+		}
 		// particle has track
-		//if (particle.iTrack() == -1) {
-		//	continue;
-		//}
+		if (particle.iTrack() == -1) {
+			continue;
+		}
 		const PaTrack& track = event.vTrack(particle.iTrack());
 		PaTPar trackPar;
-		if (track.Extrapolate(caloZ, trackPar)) 
+		if (track.Extrapolate(caloZ, trackPar, false)) 
 		{
 			double tmp = std::sqrt( (cluster.X()-trackPar.X())*(cluster.X()-trackPar.X()) + (cluster.Y()-trackPar.Y())*(cluster.Y()-trackPar.Y()));
 			if (tmp<distanceR) distanceR = tmp ;
