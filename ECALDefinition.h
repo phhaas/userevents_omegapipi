@@ -26,13 +26,6 @@ class ECALDefinition
 		const PaCalorimeter& _ECAL2;
 		std::vector<int>     _vectorNeutrals;  // particle indices of photon candidates
 
-		// output tree variables
-		//TODO are separate sets for ECAL 1 and ECAL 2 really needed?
-		//     wouldn't it be easier to add a vector with the ECAL indices?
-		// ECAL 1
-
-		// ECAL 2
-
 		// Both ECALs
 		unsigned long       _neutralClusterNumber;
 		std::vector<int> _neutralClusterIndex;

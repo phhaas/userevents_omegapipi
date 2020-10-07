@@ -143,21 +143,20 @@ ECALDefinition::getVectorNeutrals(const PaEvent& event)
 			continue;
 		}
 
-		//TODO add information for isolation cut, i.e. closest distance of
-		//     any of the charged tracks to ECAL cluster
 		_vectorNeutrals.push_back(i);
 	}
 
 	return _vectorNeutrals;
 }
 
+// function to calculate distance to the next charged track
 double
 ECALDefinition::getIsolation(const PaEvent& event, const PaCaloClus& cluster )
 {
 	double caloZ = cluster.Z();
 	double distanceR = 500;
 	const PaVertex& vertex = event.vVertex(event.iBestPrimaryVertex());
-	
+	// iterate over all charged particles with an track and vertex at the primary vertex to find closest hit
 	for (int i = 0; i < vertex.NOutParticles(); ++i) {
 		PaParticle particle = event.vParticle(vertex.iOutParticle(i));
 		// charged particle
@@ -170,8 +169,10 @@ ECALDefinition::getIsolation(const PaEvent& event, const PaCaloClus& cluster )
 		}
 		const PaTrack& track = event.vTrack(particle.iTrack());
 		PaTPar trackPar;
+		//check if tracks can be extrapolated on same z as cluster
 		if (track.Extrapolate(caloZ, trackPar, false)) 
 		{
+			// calcelate distance in xy plane
 			double tmp = std::sqrt( (cluster.X()-trackPar.X())*(cluster.X()-trackPar.X()) + (cluster.Y()-trackPar.Y())*(cluster.Y()-trackPar.Y()));
 			if (tmp<distanceR) distanceR = tmp ;
 		}
