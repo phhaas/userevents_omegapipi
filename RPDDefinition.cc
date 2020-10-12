@@ -202,8 +202,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod, // Method: 0=noCorr
 	};
 
 	// get uncorrected momentum
-	//TODO remove unnecessary conversions from energy to momentum and back
-	double       pRPD  = std::sqrt(_energyNoCorrection * _energyNoCorrection - PROTON_MASS * PROTON_MASS);
+	double       pRPD = _energyNoCorrection;
 	const double theta = getTheta();
 	const double phi   = getPhi();
 
@@ -284,7 +283,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod, // Method: 0=noCorr
 			return -1;
 	}  // switch (useMethod)
 
-	return std::sqrt(pRPD * pRPD + PROTON_MASS * PROTON_MASS);
+	return pRPD;
 }
 
 
@@ -571,7 +570,7 @@ RPDDefinition::getInterpolatedEnergy(const double pRPD,
 		226.344, 228.811, 231.278, 233.744, 236.3, 238.767,
 		241.233, 243.789, 246.256, 248.722, 251.278, 253.833, 256.3};
 
-	const double EkinBefore = (std::sqrt(pRPD * pRPD + PROTON_MASS * PROTON_MASS) - PROTON_MASS) * 1000.;
+	const double EkinBefore = (pRPD - PROTON_MASS) * 1000.;
 	size_t i;
 	for (i = 1; i < nData - 1; ++i) {
 		if (EkinBefore < Ek[i]) {
@@ -601,7 +600,7 @@ RPDDefinition::getInterpolatedEnergy(const double pRPD,
 			b = range_Mylar[i];
 			c = range_Mylar[i + 1];
 			break;
-		case scintillator:
+		case scintillator: 
 			a = range_Scintillator[i - 1];
 			b = range_Scintillator[i];
 			c = range_Scintillator[i + 1];
