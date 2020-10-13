@@ -18,13 +18,16 @@ class ECALDefinition
 	private:
 
 		const std::vector<int>& getVectorNeutrals(const PaEvent& event);
-		double getIsolation(const PaEvent& event, const PaCaloClus& cluster);
+		struct coords2D {double X,Y;};
+		void getIsolation(const PaEvent& event);
 
 		Phast& _phast;
 
 		const PaCalorimeter& _ECAL1;
 		const PaCalorimeter& _ECAL2;
 		std::vector<int>     _vectorNeutrals;  // particle indices of photon candidates
+		std::vector<coords2D> _chargedCoordECAL1;
+		std::vector<coords2D> _chargedCoordECAL2;
 
 		// Both ECALs
 		unsigned long       _neutralClusterNumber;
