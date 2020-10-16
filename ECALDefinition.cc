@@ -5,7 +5,7 @@ ECALDefinition::ECALDefinition(TTree& tree)
 	: _phast(Phast::Ref()),
 	  _ECAL1               (PaSetup::Ref().Calorimeter(0)),
 	  _ECAL2               (PaSetup::Ref().Calorimeter(1)),
-	  _neutralClusterNumber(0)
+	  _clusterNumber(0)
 {
 	_phast.h_file->cd();
 
@@ -14,22 +14,22 @@ ECALDefinition::ECALDefinition(TTree& tree)
 	// ECAL 2
 
 	// Both ECALs
-	tree.Branch("ECAL_neutralClusterNumber",      &_neutralClusterNumber, "neutralClusterNumber/i");
-	tree.Branch("ECAL_neutralClusterIndex",       &_neutralClusterIndex);
-	tree.Branch("ECAL_neutralClusterX",           &_neutralClusterX);
-	tree.Branch("ECAL_neutralClusterY",           &_neutralClusterY);
-	tree.Branch("ECAL_neutralClusterZ",           &_neutralClusterZ);
-	tree.Branch("ECAL_neutralClusterXError",      &_neutralClusterXError);
-	tree.Branch("ECAL_neutralClusterYError",      &_neutralClusterYError);
-	tree.Branch("ECAL_neutralClusterZError",      &_neutralClusterZError);
-	tree.Branch("ECAL_neutralClusterEnergy",      &_neutralClusterEnergy);
-	tree.Branch("ECAL_neutralClusterEnergyError", &_neutralClusterEnergyError);
-	tree.Branch("ECAL_neutralClusterTime",        &_neutralClusterTime);
-	tree.Branch("ECAL_neutralClusterSize",        &_neutralClusterSize);
-	tree.Branch("ECAL_IndexCell",                 &_neutralClusterIndexCell);
-	tree.Branch("ECAL_clusterXInCell",            &_neutralClusterXInCell);
-	tree.Branch("ECAL_clusterYInCell",            &_neutralClusterYInCell);
-	tree.Branch("ECAL_isolation",                 &_neutralClusterIsolation);
+	tree.Branch("ECAL_clusterNumber",      &_clusterNumber, "clusterNumber/i");
+	tree.Branch("ECAL_clusterIndex",       &_clusterIndex);
+	tree.Branch("ECAL_clusterX",           &_clusterX);
+	tree.Branch("ECAL_clusterY",           &_clusterY);
+	tree.Branch("ECAL_clusterZ",           &_clusterZ);
+	tree.Branch("ECAL_clusterXError",      &_clusterXError);
+	tree.Branch("ECAL_clusterYError",      &_clusterYError);
+	tree.Branch("ECAL_clusterZError",      &_clusterZError);
+	tree.Branch("ECAL_clusterEnergy",      &_clusterEnergy);
+	tree.Branch("ECAL_clusterEnergyError", &_clusterEnergyError);
+	tree.Branch("ECAL_clusterTime",        &_clusterTime);
+	tree.Branch("ECAL_clusterSize",        &_clusterSize);
+	tree.Branch("ECAL_IndexCell",                 &_clusterIndexCell);
+	tree.Branch("ECAL_clusterXInCell",            &_clusterXInCell);
+	tree.Branch("ECAL_clusterYInCell",            &_clusterYInCell);
+	tree.Branch("ECAL_isolation",                 &_clusterIsolation);
 }
 
 
@@ -39,37 +39,37 @@ ECALDefinition::fill(const PaEvent& event)
 	getIsolation(event);
 
 	// Both ECALs
-	_neutralClusterNumber = getNumberNeutralClusters(event);
-	_neutralClusterIndex.clear();
-	_neutralClusterX.clear();
-	_neutralClusterY.clear();
-	_neutralClusterZ.clear();
-	_neutralClusterXError.clear();
-	_neutralClusterYError.clear();
-	_neutralClusterZError.clear();
-	_neutralClusterEnergy.clear();
-	_neutralClusterEnergyError.clear();
-	_neutralClusterTime.clear();
-	_neutralClusterSize.clear();
-	_neutralClusterIndexCell.clear();
-	_neutralClusterXInCell.clear();
-	_neutralClusterYInCell.clear();
-	_neutralClusterIsolation.clear();
-	_neutralClusterIndex.reserve      (_neutralClusterNumber);
-	_neutralClusterX.reserve          (_neutralClusterNumber);
-	_neutralClusterY.reserve          (_neutralClusterNumber);
-	_neutralClusterZ.reserve          (_neutralClusterNumber);
-	_neutralClusterXError.reserve     (_neutralClusterNumber);
-	_neutralClusterYError.reserve     (_neutralClusterNumber);
-	_neutralClusterZError.reserve     (_neutralClusterNumber);
-	_neutralClusterEnergy.reserve     (_neutralClusterNumber);
-	_neutralClusterEnergyError.reserve(_neutralClusterNumber);
-	_neutralClusterTime.reserve       (_neutralClusterNumber);
-	_neutralClusterSize.reserve       (_neutralClusterNumber);
-	_neutralClusterIndexCell.reserve  (_neutralClusterNumber);
-	_neutralClusterXInCell.reserve    (_neutralClusterNumber);
-	_neutralClusterYInCell.reserve    (_neutralClusterNumber);
-	_neutralClusterIsolation.reserve    (_neutralClusterNumber);
+	_clusterNumber = getNumberNeutralClusters(event);
+	_clusterIndex.clear();
+	_clusterX.clear();
+	_clusterY.clear();
+	_clusterZ.clear();
+	_clusterXError.clear();
+	_clusterYError.clear();
+	_clusterZError.clear();
+	_clusterEnergy.clear();
+	_clusterEnergyError.clear();
+	_clusterTime.clear();
+	_clusterSize.clear();
+	_clusterIndexCell.clear();
+	_clusterXInCell.clear();
+	_clusterYInCell.clear();
+	_clusterIsolation.clear();
+	_clusterIndex.reserve      (_clusterNumber);
+	_clusterX.reserve          (_clusterNumber);
+	_clusterY.reserve          (_clusterNumber);
+	_clusterZ.reserve          (_clusterNumber);
+	_clusterXError.reserve     (_clusterNumber);
+	_clusterYError.reserve     (_clusterNumber);
+	_clusterZError.reserve     (_clusterNumber);
+	_clusterEnergy.reserve     (_clusterNumber);
+	_clusterEnergyError.reserve(_clusterNumber);
+	_clusterTime.reserve       (_clusterNumber);
+	_clusterSize.reserve       (_clusterNumber);
+	_clusterIndexCell.reserve  (_clusterNumber);
+	_clusterXInCell.reserve    (_clusterNumber);
+	_clusterYInCell.reserve    (_clusterNumber);
+	_clusterIsolation.reserve  (_clusterNumber);
 	
 	for (size_t i = 0; i < _vectorNeutrals.size(); ++i) {
 		const PaParticle& particle = event.vParticle(_vectorNeutrals[i]);
@@ -81,12 +81,12 @@ ECALDefinition::fill(const PaEvent& event)
 		double isolation = 50000;
 		if (_ECAL1.IsMyCluster(cluster)) {
 			// ECAL 1
-			_neutralClusterIndex.push_back(1);
-			_neutralClusterIndexCell.push_back(_ECAL1.iCell(cluster.X(), cluster.Y(), cellX, cellY, 0));
+			_clusterIndex.push_back(1);
+			_clusterIndexCell.push_back(_ECAL1.iCell(cluster.X(), cluster.Y(), cellX, cellY, 0));
 			dX = cluster.X() - cellX;
 			dY = cluster.Y() - cellY;
-			_neutralClusterXInCell.push_back(dX);
-			_neutralClusterYInCell.push_back(dY);
+			_clusterXInCell.push_back(dX);
+			_clusterYInCell.push_back(dY);
 			// calculate isolation for ECAL1
 			for (size_t j = 0; j < _chargedCoordECAL1.size(); ++j) {
 				double tmpDist = std::sqrt((_chargedCoordECAL1[j].X - cluster.X())*(_chargedCoordECAL1[j].X - cluster.X()) 
@@ -95,12 +95,12 @@ ECALDefinition::fill(const PaEvent& event)
 			}
 		} else if (_ECAL2.IsMyCluster(cluster)) {
 			// ECAL 2
-			_neutralClusterIndex.push_back(2);
-			_neutralClusterIndexCell.push_back(_ECAL2.iCell(cluster.X(), cluster.Y(), cellX, cellY, 0));
+			_clusterIndex.push_back(2);
+			_clusterIndexCell.push_back(_ECAL2.iCell(cluster.X(), cluster.Y(), cellX, cellY, 0));
 			dX = cluster.X() - cellX;
 			dY = cluster.Y() - cellY;
-			_neutralClusterXInCell.push_back(dX);
-			_neutralClusterYInCell.push_back(dY);
+			_clusterXInCell.push_back(dX);
+			_clusterYInCell.push_back(dY);
 			// calculate isolation for ECAL2
 			for (size_t j = 0; j < _chargedCoordECAL2.size(); ++j) {
 				double tmpDist = std::sqrt((_chargedCoordECAL2[j].X - cluster.X())*(_chargedCoordECAL2[j].X - cluster.X()) 
@@ -109,17 +109,17 @@ ECALDefinition::fill(const PaEvent& event)
 			}
 		}
 		// Both ECALs
-		_neutralClusterX.push_back          (cluster.X()     );
-		_neutralClusterY.push_back          (cluster.Y()     );
-		_neutralClusterZ.push_back          (cluster.Z()     );
-		_neutralClusterEnergy.push_back     (cluster.E()     );
-		_neutralClusterXError.push_back     (cluster.Cov()[0]);
-		_neutralClusterYError.push_back     (cluster.Cov()[2]);
-		_neutralClusterZError.push_back     (cluster.Cov()[5]);
-		_neutralClusterEnergyError.push_back(cluster.Eerr()  );
-		_neutralClusterTime.push_back       (cluster.Time()  );
-		_neutralClusterSize.push_back       (cluster.Size()  );
-		_neutralClusterIsolation.push_back  ( isolation);
+		_clusterX.push_back          (cluster.X()     );
+		_clusterY.push_back          (cluster.Y()     );
+		_clusterZ.push_back          (cluster.Z()     );
+		_clusterEnergy.push_back     (cluster.E()     );
+		_clusterXError.push_back     (cluster.Cov()[0]);
+		_clusterYError.push_back     (cluster.Cov()[2]);
+		_clusterZError.push_back     (cluster.Cov()[5]);
+		_clusterEnergyError.push_back(cluster.Eerr()  );
+		_clusterTime.push_back       (cluster.Time()  );
+		_clusterSize.push_back       (cluster.Size()  );
+		_clusterIsolation.push_back  ( isolation);
 		
 	}  // loop over _vectorNeutrals
 }

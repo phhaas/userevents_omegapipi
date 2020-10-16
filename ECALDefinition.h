@@ -30,22 +30,22 @@ class ECALDefinition
 		std::vector<coords2D> _chargedCoordECAL2;
 
 		// Both ECALs
-		unsigned long       _neutralClusterNumber;
-		std::vector<int> _neutralClusterIndex;
-		std::vector<double> _neutralClusterX;
-		std::vector<double> _neutralClusterY;
-		std::vector<double> _neutralClusterZ;
-		std::vector<double> _neutralClusterXError;
-		std::vector<double> _neutralClusterYError;
-		std::vector<double> _neutralClusterZError;
-		std::vector<double> _neutralClusterEnergy;
-		std::vector<double> _neutralClusterEnergyError;
-		std::vector<double> _neutralClusterTime;
-		std::vector<int> _neutralClusterSize;
-		std::vector<int>    _neutralClusterIndexCell;
-		std::vector<double> _neutralClusterXInCell;
-		std::vector<double> _neutralClusterYInCell;
-		std::vector<double> _neutralClusterIsolation;
+		unsigned long       _clusterNumber;
+		std::vector<int> _clusterIndex;
+		std::vector<double> _clusterX;
+		std::vector<double> _clusterY;
+		std::vector<double> _clusterZ;
+		std::vector<double> _clusterXError;
+		std::vector<double> _clusterYError;
+		std::vector<double> _clusterZError;
+		std::vector<double> _clusterEnergy;
+		std::vector<double> _clusterEnergyError;
+		std::vector<double> _clusterTime;
+		std::vector<int> _clusterSize;
+		std::vector<int>    _clusterIndexCell;
+		std::vector<double> _clusterXInCell;
+		std::vector<double> _clusterYInCell;
+		std::vector<double> _clusterIsolation;
 
 };
 
