@@ -29,14 +29,15 @@ ECALDefinition::ECALDefinition(TTree& tree)
 	tree.Branch("ECAL_IndexCell",                 &_clusterIndexCell);
 	tree.Branch("ECAL_clusterXInCell",            &_clusterXInCell);
 	tree.Branch("ECAL_clusterYInCell",            &_clusterYInCell);
-	tree.Branch("ECAL_isolation",                 &_clusterIsolation);
+	tree.Branch("ECAL_clusterChargeDistance",     &_clusterChargeDistance);
+	tree.Branch("ECAL_closestChargeDistance",     &_closestChargeDistance, "closestChargeDistance/d");
 }
 
 
 void
 ECALDefinition::fill(const PaEvent& event)
 {
-	getIsolation(event);
+	getChargeDistance(event);
 
 	// Both ECALs
 	_clusterNumber = getNumberNeutralClusters(event);
@@ -54,23 +55,24 @@ ECALDefinition::fill(const PaEvent& event)
 	_clusterIndexCell.clear();
 	_clusterXInCell.clear();
 	_clusterYInCell.clear();
-	_clusterIsolation.clear();
-	_clusterIndex.reserve      (_clusterNumber);
-	_clusterX.reserve          (_clusterNumber);
-	_clusterY.reserve          (_clusterNumber);
-	_clusterZ.reserve          (_clusterNumber);
-	_clusterXError.reserve     (_clusterNumber);
-	_clusterYError.reserve     (_clusterNumber);
-	_clusterZError.reserve     (_clusterNumber);
-	_clusterEnergy.reserve     (_clusterNumber);
-	_clusterEnergyError.reserve(_clusterNumber);
-	_clusterTime.reserve       (_clusterNumber);
-	_clusterSize.reserve       (_clusterNumber);
-	_clusterIndexCell.reserve  (_clusterNumber);
-	_clusterXInCell.reserve    (_clusterNumber);
-	_clusterYInCell.reserve    (_clusterNumber);
-	_clusterIsolation.reserve  (_clusterNumber);
-	
+	_clusterChargeDistance.clear();
+	_clusterIndex.reserve          (_clusterNumber);
+	_clusterX.reserve              (_clusterNumber);
+	_clusterY.reserve              (_clusterNumber);
+	_clusterZ.reserve              (_clusterNumber);
+	_clusterXError.reserve         (_clusterNumber);
+	_clusterYError.reserve         (_clusterNumber);
+	_clusterZError.reserve         (_clusterNumber);
+	_clusterEnergy.reserve         (_clusterNumber);
+	_clusterEnergyError.reserve    (_clusterNumber);
+	_clusterTime.reserve           (_clusterNumber);
+	_clusterSize.reserve           (_clusterNumber);
+	_clusterIndexCell.reserve      (_clusterNumber);
+	_clusterXInCell.reserve        (_clusterNumber);
+	_clusterYInCell.reserve        (_clusterNumber);
+	_clusterChargeDistance.reserve (_clusterNumber);
+	_closestChargeDistance = 50000;
+
 	for (size_t i = 0; i < _vectorNeutrals.size(); ++i) {
 		const PaParticle& particle = event.vParticle(_vectorNeutrals[i]);
 		const PaCaloClus& cluster  = event.vCaloClus(particle.iCalorim(0));
@@ -78,7 +80,7 @@ ECALDefinition::fill(const PaEvent& event)
 		double cellY;
 		double dX;
 		double dY;
-		double isolation = 50000;
+		double chargeDistance = 50000;
 		if (_ECAL1.IsMyCluster(cluster)) {
 			// ECAL 1
 			_clusterIndex.push_back(1);
@@ -87,11 +89,11 @@ ECALDefinition::fill(const PaEvent& event)
 			dY = cluster.Y() - cellY;
 			_clusterXInCell.push_back(dX);
 			_clusterYInCell.push_back(dY);
-			// calculate isolation for ECAL1
+			// calculate closest distance to a charge for ECAL2
 			for (size_t j = 0; j < _chargedCoordECAL1.size(); ++j) {
-				double tmpDist = std::sqrt((_chargedCoordECAL1[j].X - cluster.X())*(_chargedCoordECAL1[j].X - cluster.X()) 
+				double tmpDist = std::sqrt((_chargedCoordECAL1[j].X - cluster.X())*(_chargedCoordECAL1[j].X - cluster.X())
 					+ (_chargedCoordECAL1[j].Y - cluster.Y())*(_chargedCoordECAL1[j].Y - cluster.Y()));
-				if (tmpDist < isolation) isolation = tmpDist;
+				if (tmpDist < chargeDistance) chargeDistance = tmpDist;
 			}
 		} else if (_ECAL2.IsMyCluster(cluster)) {
 			// ECAL 2
@@ -101,27 +103,31 @@ ECALDefinition::fill(const PaEvent& event)
 			dY = cluster.Y() - cellY;
 			_clusterXInCell.push_back(dX);
 			_clusterYInCell.push_back(dY);
-			// calculate isolation for ECAL2
+			// calculate closest distance to a charge for ECAL2
 			for (size_t j = 0; j < _chargedCoordECAL2.size(); ++j) {
-				double tmpDist = std::sqrt((_chargedCoordECAL2[j].X - cluster.X())*(_chargedCoordECAL2[j].X - cluster.X()) 
+				double tmpDist = std::sqrt((_chargedCoordECAL2[j].X - cluster.X())*(_chargedCoordECAL2[j].X - cluster.X())
 					+ (_chargedCoordECAL2[j].Y - cluster.Y())*(_chargedCoordECAL2[j].Y - cluster.Y()));
-				if (tmpDist < isolation) isolation = tmpDist;
+				if (tmpDist < chargeDistance) chargeDistance = tmpDist;
 			}
 		}
+		// check if the distance to the next charge is smaller than for previous checked hits
+		if (chargeDistance < _closestChargeDistance) _closestChargeDistance = chargeDistance;
 		// Both ECALs
-		_clusterX.push_back          (cluster.X()     );
-		_clusterY.push_back          (cluster.Y()     );
-		_clusterZ.push_back          (cluster.Z()     );
-		_clusterEnergy.push_back     (cluster.E()     );
-		_clusterXError.push_back     (cluster.Cov()[0]);
-		_clusterYError.push_back     (cluster.Cov()[2]);
-		_clusterZError.push_back     (cluster.Cov()[5]);
-		_clusterEnergyError.push_back(cluster.Eerr()  );
-		_clusterTime.push_back       (cluster.Time()  );
-		_clusterSize.push_back       (cluster.Size()  );
-		_clusterIsolation.push_back  ( isolation);
-		
+		_clusterX.push_back                  (cluster.X()     );
+		_clusterY.push_back                  (cluster.Y()     );
+		_clusterZ.push_back                  (cluster.Z()     );
+		_clusterEnergy.push_back             (cluster.E()     );
+		_clusterXError.push_back             (cluster.Cov()[0]);
+		_clusterYError.push_back             (cluster.Cov()[2]);
+		_clusterZError.push_back             (cluster.Cov()[5]);
+		_clusterEnergyError.push_back        (cluster.Eerr()  );
+		_clusterTime.push_back               (cluster.Time()  );
+		_clusterSize.push_back               (cluster.Size()  );
+		_clusterChargeDistance.push_back     (chargeDistance);
+
+
 	}  // loop over _vectorNeutrals
+
 }
 
 const std::vector<int>&
@@ -161,7 +167,7 @@ ECALDefinition::getVectorNeutrals(const PaEvent& event)
 
 // function to calculate distance to the next charged track
 void
-ECALDefinition::getIsolation(const PaEvent& event)
+ECALDefinition::getChargeDistance(const PaEvent& event)
 {
 	const PaVertex& vertex = event.vVertex(event.iBestPrimaryVertex());
 	_chargedCoordECAL1.clear();
@@ -182,12 +188,13 @@ ECALDefinition::getIsolation(const PaEvent& event)
 		const PaTrack& track = event.vTrack(particle.iTrack());
 		PaTPar trackPar;
 		//check if tracks can be extrapolated to same z as ECAL1
-		if (track.Extrapolate(1385, trackPar, false)) 
+		// TODO check Z coord
+		if (track.Extrapolate(1385, trackPar, false))
 		{
 			_chargedCoordECAL1.push_back({trackPar.X(), trackPar.Y()});
 		}
-		// same for ECAL2 
-		if (track.Extrapolate(3315, trackPar, false)) 
+		// same for ECAL2
+		if (track.Extrapolate(3315, trackPar, false))
 		{
 			_chargedCoordECAL2.push_back({trackPar.X(), trackPar.Y()});
 		}

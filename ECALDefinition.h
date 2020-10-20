@@ -19,7 +19,7 @@ class ECALDefinition
 
 		const std::vector<int>& getVectorNeutrals(const PaEvent& event);
 		struct coords2D {double X,Y;};
-		void getIsolation(const PaEvent& event);
+		void getChargeDistance(const PaEvent& event);
 
 		Phast& _phast;
 
@@ -45,7 +45,8 @@ class ECALDefinition
 		std::vector<int>    _clusterIndexCell;
 		std::vector<double> _clusterXInCell;
 		std::vector<double> _clusterYInCell;
-		std::vector<double> _clusterIsolation;
+		std::vector<double> _clusterChargeDistance;
+		double _closestChargeDistance;
 
 };
 
