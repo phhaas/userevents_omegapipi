@@ -14,23 +14,23 @@ ECALDefinition::ECALDefinition(TTree& tree)
 	// ECAL 2
 
 	// Both ECALs
-	tree.Branch("ECAL_clusterNumber",      &_clusterNumber, "clusterNumber/i");
-	tree.Branch("ECAL_clusterIndex",       &_clusterIndex);
-	tree.Branch("ECAL_clusterX",           &_clusterX);
-	tree.Branch("ECAL_clusterY",           &_clusterY);
-	tree.Branch("ECAL_clusterZ",           &_clusterZ);
-	tree.Branch("ECAL_clusterXError",      &_clusterXError);
-	tree.Branch("ECAL_clusterYError",      &_clusterYError);
-	tree.Branch("ECAL_clusterZError",      &_clusterZError);
-	tree.Branch("ECAL_clusterEnergy",      &_clusterEnergy);
-	tree.Branch("ECAL_clusterEnergyError", &_clusterEnergyError);
-	tree.Branch("ECAL_clusterTime",        &_clusterTime);
-	tree.Branch("ECAL_clusterSize",        &_clusterSize);
-	tree.Branch("ECAL_IndexCell",                 &_clusterIndexCell);
-	tree.Branch("ECAL_clusterXInCell",            &_clusterXInCell);
-	tree.Branch("ECAL_clusterYInCell",            &_clusterYInCell);
-	tree.Branch("ECAL_clusterChargeDistance",     &_clusterChargeDistance);
-	tree.Branch("ECAL_closestChargeDistance",     &_closestChargeDistance, "closestChargeDistance/d");
+	tree.Branch("ECAL_clusterNumber",         &_clusterNumber, "clusterNumber/i");
+	tree.Branch("ECAL_clusterIndex",          &_clusterIndex);
+	tree.Branch("ECAL_clusterX",              &_clusterX);
+	tree.Branch("ECAL_clusterY",              &_clusterY);
+	tree.Branch("ECAL_clusterZ",              &_clusterZ);
+	tree.Branch("ECAL_clusterXVariance",      &_clusterXVariance);
+	tree.Branch("ECAL_clusterYVariance",      &_clusterYVariance);
+	tree.Branch("ECAL_clusterZVariance",      &_clusterZVariance);
+	tree.Branch("ECAL_clusterEnergy",         &_clusterEnergy);
+	tree.Branch("ECAL_clusterEnergyVariance", &_clusterEnergyVariance);
+	tree.Branch("ECAL_clusterTime",           &_clusterTime);
+	tree.Branch("ECAL_clusterSize",           &_clusterSize);
+	tree.Branch("ECAL_IndexCell",             &_clusterIndexCell);
+	tree.Branch("ECAL_clusterXInCell",        &_clusterXInCell);
+	tree.Branch("ECAL_clusterYInCell",        &_clusterYInCell);
+	tree.Branch("ECAL_clusterChargeDistance", &_clusterChargeDistance);
+	tree.Branch("ECAL_closestChargeDistance", &_closestChargeDistance, "closestChargeDistance/d");
 }
 
 
@@ -45,11 +45,11 @@ ECALDefinition::fill(const PaEvent& event)
 	_clusterX.clear();
 	_clusterY.clear();
 	_clusterZ.clear();
-	_clusterXError.clear();
-	_clusterYError.clear();
-	_clusterZError.clear();
+	_clusterXVariance.clear();
+	_clusterYVariance.clear();
+	_clusterZVariance.clear();
 	_clusterEnergy.clear();
-	_clusterEnergyError.clear();
+	_clusterEnergyVariance.clear();
 	_clusterTime.clear();
 	_clusterSize.clear();
 	_clusterIndexCell.clear();
@@ -60,11 +60,11 @@ ECALDefinition::fill(const PaEvent& event)
 	_clusterX.reserve              (_clusterNumber);
 	_clusterY.reserve              (_clusterNumber);
 	_clusterZ.reserve              (_clusterNumber);
-	_clusterXError.reserve         (_clusterNumber);
-	_clusterYError.reserve         (_clusterNumber);
-	_clusterZError.reserve         (_clusterNumber);
+	_clusterXVariance.reserve      (_clusterNumber);
+	_clusterYVariance.reserve      (_clusterNumber);
+	_clusterZVariance.reserve      (_clusterNumber);
 	_clusterEnergy.reserve         (_clusterNumber);
-	_clusterEnergyError.reserve    (_clusterNumber);
+	_clusterEnergyVariance.reserve (_clusterNumber);
 	_clusterTime.reserve           (_clusterNumber);
 	_clusterSize.reserve           (_clusterNumber);
 	_clusterIndexCell.reserve      (_clusterNumber);
@@ -117,10 +117,10 @@ ECALDefinition::fill(const PaEvent& event)
 		_clusterY.push_back                  (cluster.Y()     );
 		_clusterZ.push_back                  (cluster.Z()     );
 		_clusterEnergy.push_back             (cluster.E()     );
-		_clusterXError.push_back             (cluster.Cov()[0]);
-		_clusterYError.push_back             (cluster.Cov()[2]);
-		_clusterZError.push_back             (cluster.Cov()[5]);
-		_clusterEnergyError.push_back        (cluster.Eerr()  );
+		_clusterXVariance.push_back          (cluster.Cov()[0]);
+		_clusterYVariance.push_back          (cluster.Cov()[2]);
+		_clusterZVariance.push_back          (cluster.Cov()[5]);
+		_clusterEnergyVariance.push_back     (cluster.Eerr()  );
 		_clusterTime.push_back               (cluster.Time()  );
 		_clusterSize.push_back               (cluster.Size()  );
 		_clusterChargeDistance.push_back     (chargeDistance);

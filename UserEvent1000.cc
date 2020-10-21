@@ -107,8 +107,7 @@ UserEvent1000(PaEvent& event)
 	}
 	selectionHelper->fillStatistics("ECAL Cluster");
 
-	// Loop over vertices
-	// fixed multiple vertices
+	// only consider best vertex
 	bool accepted = false;
 	const PaVertex& vertex = event.vVertex(event.iBestPrimaryVertex());
 	

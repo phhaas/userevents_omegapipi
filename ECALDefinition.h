@@ -31,17 +31,17 @@ class ECALDefinition
 
 		// Both ECALs
 		unsigned long       _clusterNumber;
-		std::vector<int> _clusterIndex;
+		std::vector<int>    _clusterIndex;
 		std::vector<double> _clusterX;
 		std::vector<double> _clusterY;
 		std::vector<double> _clusterZ;
-		std::vector<double> _clusterXError;
-		std::vector<double> _clusterYError;
-		std::vector<double> _clusterZError;
+		std::vector<double> _clusterXVariance;
+		std::vector<double> _clusterYVariance;
+		std::vector<double> _clusterZVariance;
 		std::vector<double> _clusterEnergy;
-		std::vector<double> _clusterEnergyError;
+		std::vector<double> _clusterEnergyVariance;
 		std::vector<double> _clusterTime;
-		std::vector<int> _clusterSize;
+		std::vector<int>    _clusterSize;
 		std::vector<int>    _clusterIndexCell;
 		std::vector<double> _clusterXInCell;
 		std::vector<double> _clusterYInCell;

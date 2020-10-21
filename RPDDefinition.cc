@@ -194,6 +194,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod, // Method: 0=noCorr
 	};  // [cm]
 	
 	 // 0=hydrogen, 1=aluminium, 2=mylar, 3=scintillator, 4=lead, 5=tungesten
+	 // TODO target materials are wrong
 	const int targetMaterial[16] = {
 		tungsten, tungsten, tungsten, tungsten,
 		tungsten, tungsten, tungsten, tungsten,
@@ -202,6 +203,7 @@ RPDDefinition::getCorrectedEnergy(const int       useMethod, // Method: 0=noCorr
 	};
 
 	// get uncorrected momentum
+	// TODO rename pRPD
 	double       pRPD = _energyNoCorrection;
 	const double theta = getTheta();
 	const double phi   = getPhi();
